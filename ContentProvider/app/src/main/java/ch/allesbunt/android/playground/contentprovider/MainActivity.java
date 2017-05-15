@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity
     private static final int LOADER_ID = 0;
     private static final String LOADER_SEARCH_QUERY = TAG + ":loaderSearchQuery";
 
+    private Cursor cursor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,13 +30,7 @@ public class MainActivity extends AppCompatActivity
 
         // Set strict mode.
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build());
-
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
                 .detectLeakedClosableObjects()
                 .penaltyLog()
                 .penaltyDeath()
@@ -94,12 +90,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.d(TAG, "Loader Finished");
+
+        final Cursor oldCursor = this.cursor;
+        this.cursor = cursor;
+
+        if (oldCursor != null) {
+            oldCursor.close();
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.d(TAG, "Loader Reset");
+
+        if (cursor != null) {
+            cursor.close();
+        }
     }
 }
